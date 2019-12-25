@@ -21,8 +21,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.w3c.dom.Text;
+
+import java.util.HashMap;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -66,6 +70,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                finish();
             }
         });
 
@@ -115,7 +120,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         String email = emailEt.getText().toString().trim();
         String password = passwordEt.getText().toString().trim();
-        String confirmPassword = confirmPasswordEt.getText().toString().trim();
 
         //validate
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
@@ -153,10 +157,12 @@ public class RegisterActivity extends AppCompatActivity {
                             progressDialog.dismiss();
                             FirebaseUser user = mAuth.getCurrentUser();
 
+                            storeUserInfo(user);
+
                             Toast.makeText(RegisterActivity.this, "Registered" + user.getEmail(), Toast.LENGTH_SHORT).show();
 
                             // start profile activity
-                            startActivity(new Intent(RegisterActivity.this, ProfileActivity.class));
+                            startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                             finish();
 
                         }
@@ -177,6 +183,31 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(RegisterActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
+    }
+
+    private void storeUserInfo(FirebaseUser user){
+
+        // get user email and uid
+        String email = user.getEmail();
+        String uid = user.getUid();
+
+        //when user is registered store user info in FireBase realtime database using HashMap
+        HashMap<Object, String> hashMap = new HashMap<>();
+
+        //put info in HashMap
+        hashMap.put("email", email);
+        hashMap.put("uid", uid);
+        hashMap.put("name", "");      // will be added later using edit profile
+        hashMap.put("phone", "");
+        hashMap.put("image", "");
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+        //path to store user data
+        DatabaseReference reference = database.getReference("Users");
+
+        reference.child(uid).setValue(hashMap);
 
     }
 

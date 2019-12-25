@@ -7,9 +7,9 @@
     android:padding="20dp"
     tools:context=".LoginActivity">
 
-    <!-- Email -->
 
     <TextView
+        android:id="@+id/loginText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/login"
@@ -17,11 +17,14 @@
         android:textSize="25sp"
         android:textColor="@color/colorBlack"/>
 
+    <!-- Email -->
+
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_below="@+id/loginText"
+        android:layout_marginTop="150dp"
         android:id="@+id/emailTIL">
 
         <EditText
@@ -40,7 +43,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
         android:layout_below="@+id/emailTIL"
         android:id="@+id/passwordTIL"
         app:passwordToggleEnabled="true">
@@ -64,7 +66,29 @@
         android:layout_centerHorizontal="true"
         android:drawableStart="@drawable/ic_account_login"
         android:drawablePadding="8dp"
+        android:layout_marginTop="5dp"
         android:id="@+id/login_btn"/>
+
+    <TextView
+        android:id="@+id/recoverPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/forgot_password_recover"
+        android:textAlignment="center"
+        android:textColor="@color/colorBlack"
+        android:layout_below="@+id/login_btn"
+        android:layout_marginTop="5dp"/>
+
+    <!-- google signIn button -->
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/googleLoginBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/recoverPassword"
+        android:layout_marginTop="10dp"/>
+
 
     <TextView
         android:id="@+id/registerTextView"
@@ -72,9 +96,9 @@
         android:layout_height="wrap_content"
         android:text="@string/new_user_register"
         android:textColor="@color/colorBlack"
-        android:layout_below="@+id/login_btn"
+        android:layout_alignParentBottom="true"
         android:textAlignment="center"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginBottom="20dp"/>
 
 </RelativeLayout>
 
