@@ -9,15 +9,20 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.sql.RowId;
+
 public class ProfileActivity extends AppCompatActivity {
 
     //widgets
     BottomNavigationView bottomNavigationView;
+
+    ActionBar actionBar;
 
     FirebaseAuth firebaseAuth;
 
@@ -27,10 +32,10 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         //ActionBar and its title
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Profile");
+        actionBar = getSupportActionBar();
 
         init();
+        callHomeFragment();
 
         bottomNavigationView.setOnNavigationItemSelectedListener(selectedListener);
 
@@ -53,20 +58,50 @@ public class ProfileActivity extends AppCompatActivity {
 
                         case R.id.nav_home:
                             //home fragment transaction
+                            callHomeFragment();
                             return true;
 
                         case R.id.nav_profile:
                             //profile fragment transaction
+                            callProfileFragment();
                             return true;
 
                         case R.id.nav_users:
                             // users fragment transaction
+                            callUsersFragment();
                             return true;
                     }
 
                     return false;
                 }
             };
+
+    private void callHomeFragment(){
+
+        actionBar.setTitle("Home");
+        HomeFragment homeFragment = new HomeFragment();
+        FragmentTransaction home_fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        home_fragmentTransaction.replace(R.id.profileActivity_container, homeFragment, "");
+        home_fragmentTransaction.commit();
+    }
+
+    private void callProfileFragment(){
+
+        actionBar.setTitle("Profile");
+        ProfileFragment profileFragment = new ProfileFragment();
+        FragmentTransaction profile_fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        profile_fragmentTransaction.replace(R.id.profileActivity_container, profileFragment, "");
+        profile_fragmentTransaction.commit();
+    }
+
+    private void callUsersFragment(){
+
+        actionBar.setTitle("Users");
+        UsersFragment usersFragment = new UsersFragment();
+        FragmentTransaction users_fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        users_fragmentTransaction.replace(R.id.profileActivity_container, usersFragment, "");
+        users_fragmentTransaction.commit();
+    }
 
     private void checkUserStatus(){
 

@@ -312,7 +312,9 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
 
-                            storeUserInfo(user);
+                            if (task.getResult().getAdditionalUserInfo().isNewUser()){
+                                storeUserInfo(user);
+                            }
 
                             startActivity(new Intent(LoginActivity.this, ProfileActivity.class));
                             finish();
@@ -348,6 +350,7 @@ public class LoginActivity extends AppCompatActivity {
         hashMap.put("name", "");      // will be added later using edit profile
         hashMap.put("phone", "");
         hashMap.put("image", "");
+        hashMap.put("coverPhoto", "");
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 

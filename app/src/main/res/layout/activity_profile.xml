@@ -10,7 +10,7 @@
 
     <!-- frame layout -->
     <FrameLayout
-        android:id="@+id/content"
+        android:id="@+id/profileActivity_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
