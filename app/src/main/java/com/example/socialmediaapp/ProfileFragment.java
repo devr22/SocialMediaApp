@@ -8,12 +8,17 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -341,6 +346,7 @@ public class ProfileFragment extends Fragment {
             // intent to start camera
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, image_uri);
+            cameraIntent.putExtra("android.intent.extra.quickCapture",true);
             startActivityForResult(cameraIntent, IMAGE_PICK_CAMERA_CODE);
         }
         catch (Exception e){
@@ -505,6 +511,52 @@ public class ProfileFragment extends Fragment {
         });
 
         builder.create().show();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        super.onCreate(savedInstanceState);
+    }
+
+    // inflate option menu
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        //inflating menu
+        inflater.inflate(R.menu.menu_main, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    // handle menu i tem click
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        int id = item.getItemId();
+        if (id == R.id.action_logout){
+
+            // logout from here
+            firebaseAuth.signOut();
+            checkUserStatus();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void checkUserStatus(){
+
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+
+        if (user != null){
+            // user is already logged in , stay here
+
+        }
+        else {
+            // go to main activity
+            startActivity(new Intent(getActivity(), MainActivity.class));
+            getActivity().finish();
+        }
+
     }
 
 }
