@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.sql.RowId;
+import java.util.zip.Inflater;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -70,6 +71,11 @@ public class ProfileActivity extends AppCompatActivity {
                             // users fragment transaction
                             callUsersFragment();
                             return true;
+
+                        case R.id.nav_chat:
+                            // users fragment transaction
+                            callChatListFragment();
+                            return true;
                     }
 
                     return false;
@@ -101,6 +107,15 @@ public class ProfileActivity extends AppCompatActivity {
         FragmentTransaction users_fragmentTransaction = getSupportFragmentManager().beginTransaction();
         users_fragmentTransaction.replace(R.id.profileActivity_container, usersFragment, "");
         users_fragmentTransaction.commit();
+    }
+
+    private void callChatListFragment(){
+
+        actionBar.setTitle("Chats");
+        ChatListFragment chatListFragment = new ChatListFragment();
+        FragmentTransaction chat_fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        chat_fragmentTransaction.replace(R.id.profileActivity_container, chatListFragment, "");
+        chat_fragmentTransaction.commit();
     }
 
     private void checkUserStatus(){
