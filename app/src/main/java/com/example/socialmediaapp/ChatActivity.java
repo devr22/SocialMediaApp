@@ -9,14 +9,18 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.socialmediaapp.adapter.AdapterChat;
+import com.example.socialmediaapp.model.ModelChat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -27,12 +31,22 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
 
     FirebaseAuth firebaseAuth;
     DatabaseReference user_databaseReference;
+
+    //for checking if user has seen message or not
+    ValueEventListener seenListener;
+    DatabaseReference userRefForSeen;
+
+    List<ModelChat> chatList;
+    AdapterChat adapterChat;
+
 
     // views
     Toolbar toolbar;
@@ -43,6 +57,7 @@ public class ChatActivity extends AppCompatActivity {
     ImageButton sendButton;
 
     String receiverUID, myUID;
+    String recieverImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +74,13 @@ public class ChatActivity extends AppCompatActivity {
         receiverStatus = findViewById(R.id.chat_receiverStatus);
         chatMessage = findViewById(R.id.chat_message);
         sendButton = findViewById(R.id.chat_sendButton);
+
+        // layout for recycler view
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(true);
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
         Intent intent = getIntent();
         receiverUID = intent.getStringExtra("receiverUid");
@@ -81,26 +103,62 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
         });
+
+        readMessage();
+        seenMessage();
+
     }
 
-    private void searchUser(){
+    private void seenMessage(){
 
-        Query userQuery = user_databaseReference.orderByChild("uid").equalTo(receiverUID);
-        userQuery.addValueEventListener(new ValueEventListener() {
+        userRefForSeen = FirebaseDatabase.getInstance().getReference("Chats");
+        seenListener = userRefForSeen.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 for (DataSnapshot ds: dataSnapshot.getChildren()){
 
-                    String name = "" + ds.child("name").getValue();
-                    String profilePhoto = "" + ds.child("profilePhoto").getValue();
+                    ModelChat chat = ds.getValue(ModelChat.class);
 
-                    receiverName.setText(name);
-                    try {
-                        Picasso.get().load(profilePhoto).placeholder(R.drawable.ic_default_profile_white).into(profilePhotoIv);
-                    }catch (Exception e){
-                        Picasso.get().load(R.drawable.ic_default_profile_white).into(profilePhotoIv);
+                    if (chat.getReceiver().equals(myUID) && chat.getSender().equals(receiverUID)){
+
+                        HashMap<String ,Object> hasSeenHashMap = new HashMap<>();
+                        hasSeenHashMap.put("isSeen", true);
+                        ds.getRef().updateChildren(hasSeenHashMap);
                     }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void readMessage(){
+
+        chatList = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                chatList.clear();
+                for (DataSnapshot ds: dataSnapshot.getChildren()){
+
+                    ModelChat chat = ds.getValue(ModelChat.class);
+                    if (chat.getReceiver().equals(myUID) && chat.getSender().equals(receiverUID)
+                        || (chat.getReceiver().equals(receiverUID) && chat.getSender().equals(myUID))){
+
+                        chatList.add(chat);
+                    }
+
+                    adapterChat = new AdapterChat(ChatActivity.this, chatList, recieverImage);
+                    adapterChat.notifyDataSetChanged();
+                    recyclerView.setAdapter(adapterChat);   // set adapter to recycler
+
+
                 }
             }
 
@@ -116,14 +174,47 @@ public class ChatActivity extends AppCompatActivity {
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
+        String timestamp = String.valueOf(System.currentTimeMillis());
+
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", myUID);
         hashMap.put("receiver", receiverUID);
         hashMap.put("message", message);
+        hashMap.put("timestamp", timestamp);
+        hashMap.put("isSeen", false);
 
         databaseReference.child("Chats").push().setValue(hashMap);
 
         chatMessage.setText("");
+    }
+
+    private void searchUser(){
+
+        Query userQuery = user_databaseReference.orderByChild("uid").equalTo(receiverUID);
+        userQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot ds: dataSnapshot.getChildren()){
+
+                    String name = "" + ds.child("name").getValue();
+                    recieverImage = "" + ds.child("profilePhoto").getValue();
+
+                    receiverName.setText(name);
+                    try {
+                        Picasso.get().load(recieverImage).placeholder(R.drawable.ic_default_profile_white).into(profilePhotoIv);
+                    }catch (Exception e){
+                        Picasso.get().load(R.drawable.ic_default_profile_white).into(profilePhotoIv);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     private void checkUserStatus(){
@@ -169,6 +260,12 @@ public class ChatActivity extends AppCompatActivity {
     protected void onStart() {
         checkUserStatus();
         super.onStart();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        userRefForSeen.removeEventListener(seenListener);
     }
 }
 

@@ -23,7 +23,8 @@
     <string name="online">Online</string>
     <string name="start_typing">Start typing</string>
     <string name="receiver_message">Receiver Message</string>
-    <string name="_01_01_2000_00_00am">01/01/2000 00:00AM</string>
     <string name="delivered">delivered</string>
     <string name="sender_message">Sender Message</string>
+    <string name="_00_00am">00:00AM</string>
+    <string name="_01_01_2000_00_00am">01/01/2000 00:00AM</string>
 </resources>

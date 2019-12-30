@@ -14,12 +14,12 @@
         <com.blogspot.atifsoftwares.circularimageview.CircularImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:id="@+id/receiver_profileIV"
+            android:id="@+id/profileIV"
             android:src="@drawable/ic_default_image"
             app:c_border_color="@null"/>
 
         <TextView
-            android:id="@+id/receiver_messageTV"
+            android:id="@+id/messageTV"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -30,7 +30,7 @@
             android:text="@string/receiver_message"/>
 
         <TextView
-            android:id="@+id/receiver_timeTV"
+            android:id="@+id/timeTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_01_01_2000_00_00am"
